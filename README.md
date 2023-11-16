@@ -101,3 +101,245 @@ Maximize resources during peak demand hours of 8–10 a.m. and 4–7 p.m. Consid
 ### Consider External Factors: 
 Factor in external elements like traffic patterns and public transportation schedules that may contribute to the observed spikes in ride demand during specific hours.
 
+# SQL Appendix
+## SQL Query to Construct the Funnel:
+```
+SELECT * FROM ( WITH q AS (
+SELECT DISTINCT CAST ((DATE_TRUNC ('DAY', download_ts)) AS DATE) AS download_dt,
+app_download_key,
+user_id,
+ride_id,
+transaction_id,
+review_id,
+age_range,
+platform,
+request_ts,
+driver_id,
+dropoff_ts,
+charge_status
+FROM metrocar
+ORDER BY 1)
+SELECT 0 AS funnel_step, 'download' AS funnel_name,
+download_dt,
+age_range,
+platform,
+COUNT(DISTINCT app_download_key) AS user_count,
+0 AS ride_count
+FROM q
+GROUP BY 3,4,5
+
+UNION ALL
+
+SELECT 1 AS funnel_step,
+'signup' AS funnel_name,
+download_dt,
+age_range,
+platform,
+COUNT(DISTINCT user_id) AS user_count,
+0 AS ride_count
+FROM q
+GROUP BY 3,4,5
+
+UNION ALL
+
+SELECT 2 AS funnel_step,
+'ride_requested' AS funnel_name,
+download_dt,
+age_range,
+platform,
+COUNT(DISTINCT CASE WHEN ride_id IS NOT NULL THEN user_id END ) AS user_count,
+COUNT(ride_id) AS ride_count
+FROM q
+GROUP BY 3,4,5
+
+UNION ALL
+
+SELECT 3 AS funnel_step,
+'ride_accepted' AS funnel_name,
+download_dt,
+age_range,
+ platform,
+COUNT(DISTINCT CASE WHEN driver_id IS NOT NULL THEN user_id END ) AS user_count,
+COUNT(CASE WHEN driver_id IS NOT NULL THEN ride_id END) AS ride_count
+FROM q
+GROUP BY 3,4,5
+
+UNION ALL
+
+SELECT 4 AS funnel_step,
+'ride_completed' AS funnel_name,
+download_dt,
+age_range,
+platform,
+COUNT(DISTINCT CASE WHEN dropoff_ts IS NOT NULL THEN user_id END ) ASuser_count,
+COUNT(CASE WHEN dropoff_ts IS NOT NULL THEN ride_id END ) AS ride_count
+FROM q
+GROUP BY 3,4,5
+
+UNION ALL
+
+SELECT 5 AS funnel_step,
+'payment' AS funnel_name,
+download_dt,
+age_range,
+platform,
+COUNT(DISTINCT CASE WHEN charge_status = 'Approved' THEN user_id END ) AS user_count,
+COUNT(CASE WHEN charge_status = 'Approved' THEN ride_id END ) AS ride_count
+FROM q
+GROUP BY 3,4,5
+
+UNION ALL
+
+SELECT 6 AS funnel_step,
+'review' AS funnel_name,
+download_dt,
+age_range,
+platform,
+COUNT (DISTINCT CASE WHEN review_id IS NOT NULL THEN user_id END ) AS user_count,
+COUNT (CASE WHEN review_id IS NOT NULL THEN ride_id END) AS ride_count
+FROM q
+GROUP BY 3,4,5
+ORDER BY 5,4,3) sub
+ORDER BY funnel_step ASC
+```
+## SQL Query to Calculate Percent of Top and Percent of Previous:
+```
+WITH q1 AS (
+WITH cte1 AS (
+SELECT funnel_step,
+funnel_name,
+SUM(user_count) AS total_users,
+LAG(SUM(user_count)) OVER() AS user_previous_value,
+FIRST_VALUE(SUM(user_count)) OVER()AS user_top_value,
+SUM(ride_count) AS total_rides,
+LAG(SUM(ride_count)) OVER() AS ride_previous_value
+FROM ( WITH q AS (
+SELECT DISTINCT CAST ((DATE_TRUNC ('DAY', download_ts)) AS DATE) AS download_dt,
+app_download_key,
+user_id, ride_id,
+transaction_id,
+review_id,
+age_range,
+platform,
+request_ts,
+driver_id,
+dropoff_ts,
+charge_status
+FROM metrocar
+ORDER BY 1)
+SELECT 0 AS funnel_step,
+'download' AS funnel_name,
+download_dt,
+age_range,
+platform,
+COUNT(DISTINCT app_download_key) AS user_count,
+0 AS ride_count
+FROM q
+GROUP BY 3,4,5
+
+UNION ALL
+SELECT 1 AS funnel_step,
+'signup' AS funnel_name,
+download_dt,
+age_range,
+platform,
+COUNT(DISTINCT user_id) AS user_count,
+0 AS ride_count
+FROM q
+GROUP BY 3,4,5
+
+
+UNION ALL
+SELECT 2 AS funnel_step,
+'ride_requested' AS funnel_name,
+download_dt,
+age_range,
+platform,
+COUNT(DISTINCT CASE WHEN ride_id IS NOT NULL THEN user_id END ) AS user_count,
+COUNT(ride_id) AS ride_count
+FROM q
+GROUP BY 3,4,5
+
+UNION ALL
+SELECT 3 AS funnel_step,
+'ride_accepted' AS funnel_name,
+download_dt,
+age_range,
+platform,
+COUNT(DISTINCT CASE WHEN driver_id IS NOT NULL THEN user_id END ) AS user_count,
+COUNT(CASE WHEN driver_id IS NOT NULL THEN ride_id END) AS ride_count
+FROM q
+GROUP BY 3,4,5
+
+
+UNION ALL
+SELECT 4 AS funnel_step, 'ride_completed' AS funnel_name, download_dt,
+age_range, platform,
+COUNT(DISTINCT CASE WHEN dropoff_ts IS NOT NULL THEN user_id END ) AS
+user_count,
+COUNT(CASE WHEN dropoff_ts IS NOT NULL THEN ride_id END ) AS ride_count FROM q
+GROUP BY 3,4,5
+
+
+UNION ALL
+SELECT 5 AS funnel_step,
+'payment' AS funnel_name,
+download_dt,
+age_range,
+platform,
+COUNT(DISTINCT CASE WHEN charge_status = 'Approved' THEN user_id END ) AS user_count,
+COUNT(CASE WHEN charge_status = 'Approved' THEN ride_id END ) AS ride_count
+FROM q
+GROUP BY 3,4,5
+
+UNION ALL
+
+SELECT 6 AS funnel_step,
+'review' AS funnel_name,
+download_dt,
+age_range,
+platform,
+COUNT(DISTINCT CASE WHEN review_id IS NOT NULL THEN user_id END ) AS user_count,
+COUNT(CASE WHEN review_id IS NOT NULL THEN ride_id END ) AS ride_count
+FROM q
+GROUP BY 3,4,5
+ORDER BY 5,4,3) sub
+GROUP BY 1,2
+ORDER BY 1)
+
+SELECT
+funnel_step,
+funnel_name,
+total_users,
+user_previous_value,
+user_top_value,
+total_rides,
+ride_previous_value,
+--ride_top_value,
+ROUND((100*total_users / user_previous_value),2) AS user_per_of_previous, ROUND((100*total_users/first_value(total_users) OVER()),2) AS user_per_of_top, CASE WHEN total_rides != 0 AND ride_previous_value != 0 THEN
+ROUND((100*total_rides / ride_previous_value),2) ELSE 0 END AS ride_perc_of_previous
+
+
+FROM cte1 ),
+q2 AS ( SELECT *,
+MAX(total_rides) OVER() ride_top_value FROM q1
+)
+
+SELECT q1.funnel_step,
+q1.funnel_name,
+q1.total_users,
+q1.user_previous_value,
+q1.user_top_value,
+q1.total_rides,
+q1.ride_previous_value,
+FIRST_VALUE(ride_top_value) OVER() AS ride_top_value,
+ROUND((100*q1.total_users / q1.user_previous_value),2) AS user_per_of_previous,
+ROUND((100*q1.total_users/first_value(q1.total_users) OVER()),2) AS user_per_of_top,
+CASE WHEN q1.total_rides != 0 AND q1.ride_previous_value != 0 THEN ROUND((100*q1.total_rides / q1.ride_previous_value),2) ELSE 0 END AS ride_perc_of_previous,
+ROUND((CASE WHEN q1.total_rides != 0 THEN 100 * q1.total_rides / FIRST_VALUE(ride_top_value) OVER() ELSE 0 END),2) AS ride_perc_of_top
+FROM q1
+LEFT JOIN q2 ON q1.funnel_step = q2.funnel_step
+```
+# Tableau Dashboard
+URL: https://public.tableau.com/app/profile/djamel.fitas/viz/MetrocarFunnelAnalysis_16983605038720/MetrocarFunnelAnalysis
+
