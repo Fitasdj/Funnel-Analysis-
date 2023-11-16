@@ -15,6 +15,23 @@ Funnel analysis is a method of data analysis used to track and understand the se
 - Capitalizing on Peak Demand Hours
 - Consider External Factors
 
+# Table of Contents
+-[SUMMARY](#summary)
+
+-[FUNNEL RESULTS](#funnel-results)
+
+-[Platform Distribution Over User Funnel](#platform-distribution-over-user-funnel)
+
+-[Age Range Distribution Over User Funnel](#age-range-distribution-over-user-funnel)
+
+-[Ride Request Distribution Through the Day](#ride-request-distribution-through-the-day)
+
+-[Recommendation and Conclusion](#recommendation-and-conclusion)
+
+-[SQL Appendix](#sql-appendix)
+  
+-[Tableau Dashboard](#tableau-dashboard)
+
 # SUMMARY
 
 The project focused on understanding and improving the user funnel, encompassing key stages from app download to ride review. Our goal was to identify areas for enhancement and optimization. The customer funnel comprises seven stages, starting from app download to review. Drop-offs occur at various stages, necessitating funnel analysis for improvement. Business questions revolve around key aspects like drop-off points, platform performance, age group preferences, surge pricing, and low conversion areas.
@@ -79,7 +96,7 @@ Moreover, these time slots may also align with standard work hours and school sc
 - Additionally, external factors such as traffic patterns and public transportation schedules may further amplify the observed spikes in ride requests. Understanding and adapting to these patterns can help Metrocar optimize its services to meet the high demand during these crucial time frames.
 ![alt text](https://github.com/Fitasdj/Funnel-Analysis-/blob/main/Ride%20Request%20Distribution.png)
 
-# Recommendation & Conclusion
+# Recommendation and Conclusion
 ### Onboarding Optimization:
 Streamline the signup process to reduce the 25.35% drop-off observed after app downloads.
 ### Enhance User Experience for Ride Completion:
