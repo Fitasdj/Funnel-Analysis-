@@ -66,6 +66,17 @@ Within the 25-34 age range, users utilizing the web platform experience the most
 ## Reviews from the 45-54 Age Group on Android:
 On the Android platform, users aged 45–54 exhibit the highest likelihood of leaving reviews, with an impressive 75.27% conversion rate. This is a positive sign, indicating that this demographic is actively engaged in providing feedback. Understanding why this age group is more inclined to leave reviews can provide valuable insights for encouraging reviews from other user segments.
 
+![alt text](https://github.com/Fitasdj/Funnel-Analysis-/blob/main/18-24.png)
+![alt text](https://github.com/Fitasdj/Funnel-Analysis-/blob/main/25-34.png)
+![alt text](https://github.com/Fitasdj/Funnel-Analysis-/blob/main/35-44.png)
+![alt text](https://github.com/Fitasdj/Funnel-Analysis-/blob/main/45-54.png)
 
+# Ride Request Distribution Through the Day
+
+- The histogram provides a clear visual representation of the hours with the highest demand for rides. Notably, there are two distinct surges in ride requests. The first surge occurs in the morning between 8-10 a.m., suggesting that a significant portion of users rely on Metrocar for their daily work commute. This influx of ride requests is likely attributed to rush-hour traffic and the need for a convenient and reliable transportation option.
+- The second surge takes place in the late afternoon to early evening, spanning from 4 to 7 PM. This pattern indicates another peak period of demand, which aligns with individuals starting their journeys back home after work or other daytime commitments. This trend is common among urban commuters seeking efficient transportation options during peak traffic hours.
+Moreover, these time slots may also align with standard work hours and school schedules, contributing to the increased demand for rides during these specific time frames. It's essential to consider the impact of these routines on the demand for Metrocar services, as they play a pivotal role in shaping user behavior and preferences.
+- Additionally, external factors such as traffic patterns and public transportation schedules may further amplify the observed spikes in ride requests. Understanding and adapting to these patterns can help Metrocar optimize its services to meet the high demand during these crucial time frames.
+![alt text](https://github.com/Fitasdj/Funnel-Analysis-/blob/main/Ride%20Request%20Distribution.png)
 
 
