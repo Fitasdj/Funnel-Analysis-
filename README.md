@@ -8,7 +8,7 @@ The project focused on understanding and improving the user funnel, encompassing
 - [Written Report](./WrittenReport.pdf)
 
 
-https://github.com/Fitasdj/Funnel-Analysis-/blob/main/Presentation.pdf
+
 # Tools Used 
 - SQL
 - SpreadSheet
